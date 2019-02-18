@@ -1,0 +1,6 @@
+bin_inter/
+bin/
+.vs/
+.git/
+**/*.vcxproj*
+*.sln
