@@ -1,5 +1,12 @@
 workspace "GGSim"
+	
 	architecture "x64"
+	
+	language "C++"
+
+	cppdialect "C++17"
+
+	toolset("clang")
 	
 	configurations
 	{
@@ -10,25 +17,47 @@ workspace "GGSim"
 outDir = "%{cfg.system}_%{cfg.architecture}/%{cfg.buildcfg}/"
 
 project "GGSim"
+
 		location "GGSim"
+
 		kind "ConsoleApp"
-		language "C++"
+
 
 		targetdir ("bin/" .. outDir .. "%{prj.name}")
+
 		objdir ("bin_inter/" .. outDir .. "%{prj.name}")
+
 
 		files
 		{
-			"%{prj.location}/src/main.cpp",
+			"%{prj.location}/src/**",
+			"%{prj.location}/include/**",
+			"%{wks.location}/external/src/**",
 		}
 
 		includedirs
 		{
-
+			"%{prj.location}/include/",
+			"%{wks.location}/external/include/",
 		}
 
+		libdirs
+		{
+			"%{wks.location}/external/lib/",
+		}
+		
+
+		filter "configurations:Debug"
+			links  "glfw3_d"
+		filter "configurations:Release"
+			links "glfw3"
+
+		filter{}
+
+		links { "dl", "X11", "GL", "pthread", "Xrandr", "Xi" }
+
+
 		filter "system:windows"
-			cppdialect "C++17"
 			staticruntime "On"
 			systemversion "latest"
 
