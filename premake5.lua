@@ -1,13 +1,13 @@
 workspace "GGSim"
-	
+
 	architecture "x64"
-	
+
 	language "C++"
 
 	cppdialect "C++17"
 
-	toolset("clang")
-	
+	toolset "clang"
+
 	configurations
 	{
 		"Debug",
@@ -45,7 +45,7 @@ project "GGSim"
 		{
 			"%{wks.location}/external/lib/",
 		}
-		
+
 
 		filter "configurations:Debug"
 			links  "glfw3_d"

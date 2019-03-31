@@ -4,5 +4,5 @@ Application Application::app;
 
 Application& Application::instance()
 {
-	return app;
+    return app;
 }

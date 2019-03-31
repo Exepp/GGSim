@@ -1,28 +1,29 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-#include <iostream>
 #include <GGSim/Application.h>
+#include <GGSim/Vec.h>
+#include <GLFW/glfw3.h>
+#include <glad/glad.h>
+#include <iostream>
+
 
 int main()
-{			
+{
     Window win(800, 600, "Test");
 
     float vertices[] = {
         -1.0f, -1.0f, 0.0f,
         -0.9f, -0.9f, 0.0f,
         -0.8f, -1.f, 0.0f,
-        -0.5f, -0.5f, 0.0f, // left
-        0.5f, -0.5f, 0.0f,                    // right
-        0.0f, 0.5f, 0.0f                      // top
-
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        0.0f, 0.5f, 0.0f
     };
 
     unsigned int VBO, VAO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-  
-	glBindVertexArray(VAO);
+
+
+    glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -37,11 +38,11 @@ int main()
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     while (win.isOpen())
     {
-		win.clear();
+        win.clear();
 
         // draw our first triangle
         win.draw();
@@ -49,8 +50,8 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         win.display();
-		glfwPollEvents();
-	}
+        glfwPollEvents();
+    }
 
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------

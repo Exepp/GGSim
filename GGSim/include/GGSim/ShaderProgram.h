@@ -10,104 +10,96 @@
 class Shader
 {
 public:
-
-	enum class Type : GLenum { Vertex = GL_VERTEX_SHADER, Fragment = GL_FRAGMENT_SHADER };
+    enum class Type : GLenum
+    {
+        Vertex   = GL_VERTEX_SHADER,
+        Fragment = GL_FRAGMENT_SHADER
+    };
 
 public:
+    Shader() = default;
 
-	Shader() = default;
+    Shader(Shader const& other) = delete;
 
-	Shader(Shader const &other) = delete;
+    Shader& operator=(Shader const& other) = delete;
 
-	Shader &operator=(Shader const &other) = delete;
+    explicit Shader(char const* path, Type type);
 
-	explicit Shader(char const *path, Type type);
+    Shader(Shader&& other);
 
-	Shader(Shader&& other);
+    Shader& operator=(Shader&& other);
 
-	Shader& operator=(Shader&& other);
-
-	~Shader();
-
-
-	void setSrc(Type type);
-
-	bool loadSrc(char const* path, Type type);
+    ~Shader();
 
 
-	bool compile();
+    void setSrc(Type type);
 
-private:
+    bool loadSrc(char const* path, Type type);
 
-	bool isSuccessful() const;
 
-	void clear();
+    bool compile();
 
 private:
+    bool isSuccessful() const;
 
-	GLuint idx = 0;
+    void clear();
 
-	std::string src;
+private:
+    GLuint idx = 0;
 
-	char const* srcPtr = nullptr;
+    std::string src;
 
-	bool compiled = false;
+    char const* srcPtr = nullptr;
 
-	friend class ShaderProgram;
+    bool compiled = false;
+
+    friend class ShaderProgram;
 };
-
-
 
 
 class ShaderProgram
 {
 public:
+    ShaderProgram();
 
-	ShaderProgram();
+    ~ShaderProgram();
 
-	~ShaderProgram();
-	
 
-	bool addShader(Shader const& shader);
+    bool addShader(Shader const& shader);
 
-	bool compile();
+    bool compile();
 
-	void use();
-
-private:
-
-	bool isSuccessful() const;
+    void use();
 
 private:
+    bool isSuccessful() const;
 
-	GLuint idx = 0;
+private:
+    GLuint idx = 0;
 
-	bool compiled = false;
+    bool compiled = false;
 };
-
 
 
 class ShaderModule : public ShaderProgram
 {
 public:
-
-	ShaderModule()
-	{
-		vertexShader = Shader("./shaders/vertex.glsl", Shader::Type::Vertex);
-		fragmentShader = Shader("./shaders/fragment.glsl", Shader::Type::Fragment);
-		if(vertexShader.compile() && fragmentShader.compile())
-		{
-			addShader(vertexShader);
-			addShader(fragmentShader);
-			compile();
-		}
-	}
+    ShaderModule()
+    {
+        vertexShader   = Shader("./shaders/vertex.glsl", Shader::Type::Vertex);
+        fragmentShader = Shader("./shaders/fragment.glsl", Shader::Type::Fragment);
+        if (vertexShader.compile() && fragmentShader.compile())
+        {
+            addShader(vertexShader);
+            addShader(fragmentShader);
+            compile();
+        }
+    }
 
 private:
+    Shader vertexShader;
 
-	Shader vertexShader;
-
-	Shader fragmentShader;
+    Shader fragmentShader;
 };
 
 #endif // SHADER_PROGRAM_H
