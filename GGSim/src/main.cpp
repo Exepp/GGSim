@@ -9,6 +9,9 @@ int main()
 {
     Window win(800, 600, "Test");
 
+    Vec3f x({ 1, 0, 0 });
+    Vec3f y({ 1, 0, 0 });
+
     float vertices[] = {
         -1.0f, -1.0f, 0.0f,
         -0.9f, -0.9f, 0.0f,

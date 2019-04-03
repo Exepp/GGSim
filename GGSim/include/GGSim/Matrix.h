@@ -10,7 +10,7 @@ private:
     using Mat_t = Matrix<T, row, col>;
 
 public:
-    Matrix() = default;
+    Matrix() { *this = Identity; };
 
     template<size_t row2, size_t col2>
     explicit Matrix(Matrix<T, row2, col2> const& other)
@@ -85,16 +85,18 @@ template<class T, size_t row, size_t col>
 Matrix<T, row, col> const Matrix<T, row, col>::Identity(1, true);
 
 template<class T, size_t row, size_t col>
-Matrix<T, row, col> const Matrix<T, row, col>::Zero;
+Matrix<T, row, col> const Matrix<T, row, col>::Zero(0, false);
 
 
 // Aliases
 
-using Mat44f = Matrix<float, 4, 4>;
+using Float_t = float;
+
+using Mat44f = Matrix<Float_t, 4, 4>;
 using Mat44u = Matrix<uint32_t, 4, 4>;
 using Mat44i = Matrix<int32_t, 4, 4>;
 
-using Mat33f = Matrix<float, 3, 3>;
+using Mat33f = Matrix<Float_t, 3, 3>;
 using Mat33u = Matrix<uint32_t, 3, 3>;
 using Mat33i = Matrix<int32_t, 3, 3>;
 
@@ -104,7 +106,7 @@ using Mat33i = Matrix<int32_t, 3, 3>;
 // matrix matrix multiplication:
 
 template<class T, size_t row1, size_t col1, size_t col2>
-Matrix<T, row1, col2> operator*(Matrix<T, row1, col1> const& lhs, Matrix<T, col1, col2> const& rhs)
+inline Matrix<T, row1, col2> operator*(Matrix<T, row1, col1> const& lhs, Matrix<T, col1, col2> const& rhs)
 {
     Matrix<T, row1, col2> result;
     for (int i = 0; i < row1; ++i)
@@ -119,7 +121,7 @@ Matrix<T, row1, col2> operator*(Matrix<T, row1, col1> const& lhs, Matrix<T, col1
 }
 
 template<class T, size_t row1, size_t col1, size_t col2>
-Matrix<T, row1, col2> operator*=(Matrix<T, row1, col1>& lhs, Matrix<T, col1, col2> const& rhs)
+inline Matrix<T, row1, col2>& operator*=(Matrix<T, row1, col1>& lhs, Matrix<T, col1, col2> const& rhs)
 {
     return lhs = lhs * rhs;
 }
@@ -129,7 +131,7 @@ Matrix<T, row1, col2> operator*=(Matrix<T, row1, col1>& lhs, Matrix<T, col1, col
 
 
 template<class T, size_t row, size_t col>
-Matrix<T, row, col> operator*(Matrix<T, row, col> const& mat, T const& scalar)
+inline Matrix<T, row, col> operator*(Matrix<T, row, col> const& mat, T scalar)
 {
     Matrix<T, row, col> result;
     for (int i = 0; i < row; ++i)
@@ -139,13 +141,13 @@ Matrix<T, row, col> operator*(Matrix<T, row, col> const& mat, T const& scalar)
 }
 
 template<class T, size_t row, size_t col>
-Matrix<T, row, col> operator*(T const& scalar, Matrix<T, row, col> const& mat)
+inline Matrix<T, row, col> operator*(T scalar, Matrix<T, row, col> const& mat)
 {
     return mat * scalar;
 }
 
 template<class T, size_t row, size_t col>
-Matrix<T, row, col>& operator*=(Matrix<T, row, col> const& mat, T const& scalar)
+inline Matrix<T, row, col>& operator*=(Matrix<T, row, col>& mat, T scalar)
 {
     return mat = mat * scalar;
 }
@@ -154,7 +156,7 @@ template<class T, size_t row, size_t col>
 inline Matrix<T, row, col> operator/(Matrix<T, row, col> const& mat, T scalar)
 {
     if (scalar)
-        return mat * 1 / scalar;
+        return mat * (T(1) / scalar);
     return Matrix<T, row, col>::Zero;
 }
 
@@ -207,6 +209,8 @@ inline Matrix<T, row, col>& operator-=(Matrix<T, row, col>& lhs, Matrix<T, row, 
 }
 
 
+// comparison:
+
 template<class T, size_t row, size_t col>
 inline bool operator==(Matrix<T, row, col> const& lhs, Matrix<T, row, col> const& rhs)
 {
@@ -221,4 +225,52 @@ template<class T, size_t row, size_t col>
 inline bool operator!=(Matrix<T, row, col> const& lhs, Matrix<T, row, col> const& rhs)
 {
     return !(lhs == rhs);
+}
+
+
+// Utility:
+
+Mat33f rollMatrix(Float_t angle)
+{
+    static Mat33f mat;
+    if (angle)
+    {
+        mat[1][1] = cos(angle);
+        mat[1][2] = -sin(angle);
+        mat[2][1] = sin(angle);
+        mat[2][2] = cos(angle);
+
+        return mat;
+    }
+    return Mat33f::Identity;
+}
+
+Mat33f pitchMatrix(Float_t angle)
+{
+    static Mat33f mat;
+    if (angle)
+    {
+        mat[0][0] = cos(angle);
+        mat[0][2] = sin(angle);
+        mat[2][0] = -sin(angle);
+        mat[2][2] = cos(angle);
+
+        return mat;
+    }
+    return Mat33f::Identity;
+}
+
+Mat33f yawMatrix(Float_t angle)
+{
+    static Mat33f mat;
+    if (angle)
+    {
+        mat[0][0] = cos(angle);
+        mat[0][1] = -sin(angle);
+        mat[1][0] = sin(angle);
+        mat[1][1] = cos(angle);
+
+        return mat;
+    }
+    return Mat33f::Identity;
 }

@@ -3,7 +3,7 @@
 class Quaternion
 {
     Vec4f quat;
-}
+};
 
 
 class Rotation
@@ -14,6 +14,13 @@ public:
         return Mat44f(rot);
     }
 
+    Vec3f angles()
+    {
+        Vec3f result;
+
+
+        return result;
+    }
 
 private:
     Mat33f rot;
