@@ -23,7 +23,7 @@ public:
                 arr[i][j] = other.arr[i][j];
         for (int i = minRow; i < row; ++i)
             for (int j = minCol; j < col; ++j)
-                arr[i][j] = 0;
+                arr[i][j] = i == j;
     }
 
     explicit Matrix(T const& val, bool diagonal)
@@ -44,6 +44,7 @@ public:
     {
         std::memcpy(this->arr, arr, row * col);
     }
+
 
     decltype(auto) transposed() const
     {

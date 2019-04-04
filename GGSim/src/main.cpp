@@ -1,5 +1,5 @@
 #include <GGSim/Application.h>
-#include <GGSim/Vec.h>
+#include <GGSim/Transformable.h>
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 #include <iostream>
@@ -11,6 +11,10 @@ int main()
 
     Vec3f x({ 1, 0, 0 });
     Vec3f y({ 1, 0, 0 });
+
+    Quaternion test(AxisZ, -M_PI / 4);
+
+    std::cout << test.transform(x).x() << " " << x.y() << " " << x.z() << std::endl;
 
     float vertices[] = {
         -1.0f, -1.0f, 0.0f,

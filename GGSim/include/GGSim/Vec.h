@@ -1,5 +1,5 @@
 #include <GGSim/Matrix.h>
-#include <assert.h>
+#include <array>
 
 template<class T, size_t n>
 struct Vec : public Matrix<T, 1, n>
@@ -14,13 +14,18 @@ private:
 public:
     Vec() = default;
 
+    template<size_t n2>
+    explicit Vec(Vec<T, n2> const& other)
+        : Mat_t(other)
+    {}
+
     Vec(Mat_t const& mat)
     {
         for (int i = 0; i < n; ++i)
             Mat_t::arr[0][i] = mat.arr[0][i];
     }
 
-    Vec(T const (&arr)[n])
+    Vec(std::array<T, n> const& arr)
     {
         for (int i = 0; i < n; ++i)
             Mat_t::arr[0][i] = arr[i];
@@ -92,7 +97,14 @@ using Vec4u = Vec<uint32_t, 4>;
 using Vec4i = Vec<int32_t, 4>;
 
 
+// constants:
+
+static Vec3f const AxisX({ 1, 0, 0 });
+static Vec3f const AxisY({ 0, 1, 0 });
+static Vec3f const AxisZ({ 0, 0, 1 });
+
 // vec3 math utilities:
+
 
 inline Vec3f crossProduct(Vec3f const& lhs, Vec3f const& rhs)
 {
