@@ -1,20 +1,19 @@
 #ifndef INITIALIZER_H
 #define INITIALIZER_H
 
-#include "TuplePP.h"
+#include <GGSim/TuplePP.h>
 #include <memory>
 
 
 template<class... MTypes>
-class Initializer
+struct Initializer
 {
-public:
     template<class T>
     using MPtr_t = std::unique_ptr<T>;
 
     using MPack_t = TuplePP<MPtr_t<MTypes>...>;
 
-public:
+
     Initializer()
     {
         ((mPack.template get<MPtr_t<MTypes>>() = std::make_unique<MTypes>()), ...);

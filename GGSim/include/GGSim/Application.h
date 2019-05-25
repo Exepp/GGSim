@@ -1,6 +1,6 @@
-#include <GGSim/Window.h>
 #include <GGSim/Initializer.h>
 #include <GGSim/ShaderProgram.h>
+#include <GGSim/Window.h>
 
 
 class Application

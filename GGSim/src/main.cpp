@@ -1,5 +1,7 @@
 #include <GGSim/Application.h>
+#include <GGSim/Shape.h>
 #include <GGSim/Transformable.h>
+#include <GGSim/VertexArray.h>
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 #include <iostream>
@@ -7,63 +9,34 @@
 
 int main()
 {
-    Window win(800, 600, "Test");
-
-    Vec3f x({ 1, 0, 0 });
-    Vec3f y({ 1, 0, 0 });
-
-    Quaternion test(AxisZ, -M_PI / 4);
-
-    std::cout << test.transform(x).x() << " " << x.y() << " " << x.z() << std::endl;
-
-    float vertices[] = {
-        -1.0f, -1.0f, 0.0f,
-        -0.9f, -0.9f, 0.0f,
-        -0.8f, -1.f, 0.0f,
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f
-    };
-
-    unsigned int VBO, VAO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-
-
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    glBindVertexArray(0);
-
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    WindowModule& win = Application::instance().get<WindowModule>();
+    Box           box({ 100, 1, 100 });
+    Sphere        sphere(3.f);
+    box.translate({ 0, -5, 0 });
+    win.translate({ 0, 0, -10 });
+    win.rotate(M_PI, { 0, 1, 0 });
 
     while (win.isOpen())
     {
         win.clear();
-
-        // draw our first triangle
-        win.draw();
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-
+        win.draw(box);
+        win.draw(sphere);
         win.display();
-        glfwPollEvents();
-    }
 
-    // optional: de-allocate all resources once they've outlived their purpose:
-    // ------------------------------------------------------------------------
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
+        win.input();
+
+        // glfwPollEvents();
+        // if (glfwGetKey(win.win, GLFW_KEY_W) == GLFW_PRESS)
+        //     box.move({ 0, 0, -0.1 });
+        // if (glfwGetKey(win.win, GLFW_KEY_S) == GLFW_PRESS)
+        //     box.move({ 0, 0, 0.1 });
+        // if (glfwGetKey(win.win, GLFW_KEY_A) == GLFW_PRESS)
+        //     box.move({ -0.1, 0, 0 });
+        // if (glfwGetKey(win.win, GLFW_KEY_D) == GLFW_PRESS)
+        //     box.move({ 0.1, 0, 0 });
+        if (glfwGetKey(win.win, GLFW_KEY_R) == GLFW_PRESS)
+            sphere.rotate(0.01, { 1, 0, 0 });
+    }
 
     return 0;
 }
