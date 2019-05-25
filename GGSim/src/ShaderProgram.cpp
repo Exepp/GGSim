@@ -1,9 +1,10 @@
-#include <glad/glad.h>
+#include <GGSim/Application.h>
+#include <GGSim/ShaderProgram.h>
+#include <GGSim/Window.h>
 #include <cstdio>
 #include <fstream>
+#include <glad/glad.h>
 #include <sstream>
-#include <GGSim/ShaderProgram.h>
-
 
 static GLchar errLog[1024] = { 0 };
 
@@ -37,10 +38,12 @@ Shader::~Shader()
     clear();
 }
 
-void Shader::setSrc(Type type)
+void Shader::setSrc(std::string source, Type type)
 {
     clear();
-    idx = glCreateShader(GLenum(type));
+    idx    = glCreateShader(GLenum(type));
+    src    = std::move(source);
+    srcPtr = src.c_str();
     glShaderSource(idx, 1, &srcPtr, NULL);
 }
 
@@ -51,9 +54,7 @@ bool Shader::loadSrc(char const* path, Type type)
     {
         std::stringstream strStream;
         strStream << stream.rdbuf();
-        src    = strStream.str();
-        srcPtr = src.c_str();
-        setSrc(type);
+        setSrc(strStream.str(), type);
         return true;
     }
     else
@@ -133,7 +134,7 @@ bool ShaderProgram::compile()
     if (!compiled)
     {
         glLinkProgram(idx);
-        compiled = true;
+        compiled = isSuccessful();
     }
     return compiled;
 }
@@ -141,4 +142,25 @@ bool ShaderProgram::compile()
 void ShaderProgram::use()
 {
     glUseProgram(idx);
+}
+
+
+ShaderModule::ShaderModule()
+{
+    Shader vertexShader   = Shader("./shaders/vertex.glsl", Shader::Type::Vertex);
+    Shader fragmentShader = Shader("./shaders/fragment.glsl", Shader::Type::Fragment);
+
+    if (vertexShader.compile() && fragmentShader.compile())
+    {
+        addShader(vertexShader);
+        addShader(fragmentShader);
+        if (compile())
+        {
+            use();
+            auto winSize = Application::instance().get<WindowModule>().Size;
+            setUniform<Mat4_t>("proj", glm::perspective(glm::radians(45.f), winSize.x / winSize.y, 0.1f, 1000.f));
+        }
+    }
+
+    glEnable(GL_DEPTH_TEST);
 }

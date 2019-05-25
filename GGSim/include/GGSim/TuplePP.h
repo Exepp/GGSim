@@ -1,4 +1,6 @@
-#pragma once
+#ifndef TUPLEPP_H
+#define TUPLEPP_H
+
 #include <tuple>
 
 
@@ -75,3 +77,5 @@ struct TuplePP : public std::tuple<TplTypes...>
 };
 
 #include "TuplePP.inl"
+
+#endif // TUPLEPP_H

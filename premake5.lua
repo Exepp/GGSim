@@ -54,6 +54,11 @@ project "GGSim"
 
 		filter{}
 
+		postbuildcommands 
+		{
+			"{COPY} %{prj.location}/src/shaders %{cfg.targetdir}"
+		}
+
 		links { "dl", "X11", "GL", "pthread", "Xrandr", "Xi" }
 
 

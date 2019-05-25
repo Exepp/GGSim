@@ -2,9 +2,16 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <string>
-#include "ShaderProgram.h"
+#include <GGSim/ShaderProgram.h>
+#include <GGSim/Shape.h>
+#include <GGSim/Transformable.h>
+#include <GGSim/VertexArray.h>
 #include <GLFW/glfw3.h>
+#include <string>
+
+
+class GLFWwindow;
+
 
 struct GlfwModule
 {
@@ -33,49 +40,33 @@ struct GladModule
 };
 
 
-class WindowModule
+class WindowModule : public Transformable
 {
 public:
-    WindowModule()
-    {
-        win = glfwCreateWindow(defWidth, defHeight, "", NULL, NULL);
-        glfwMakeContextCurrent(win);
-    }
+    WindowModule();
 
-    ~WindowModule()
-    {
-        glfwDestroyWindow(win);
-    }
-
-private:
-    class GLFWwindow* win;
-
-    static int const defWidth = 800;
-
-    static int const defHeight = 600;
-
-    friend class Window;
-};
-
-
-class Window
-{
-public:
-    explicit Window(size_t width, size_t height, std::string const& title);
-
-    void makeWindow(size_t width, size_t height, std::string const& title);
+    ~WindowModule();
 
 
     void clear();
 
-    void draw();
+    void draw(VertexArray const& va, Transform const& model);
+
+    void draw(Drawable const& toDraw);
 
     void display();
 
+    void input();
 
     void close();
 
     bool isOpen() const;
+
+public:
+    Vec2_t const Size;
+
+    // private:
+    GLFWwindow* win;
 };
 
 #endif // WINDOW_H

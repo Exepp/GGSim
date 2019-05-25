@@ -1,11 +1,10 @@
 #ifndef SHADER_PROGRAM_H
 #define SHADER_PROGRAM_H
 
-#include <string>
-
-#include <cstdint>
+#include <GGSim/Transformable.h>
 #include <glad/glad.h>
-
+#include <glm/glm.hpp>
+#include <string>
 
 class Shader
 {
@@ -32,7 +31,7 @@ public:
     ~Shader();
 
 
-    void setSrc(Type type);
+    void setSrc(std::string src, Type type);
 
     bool loadSrc(char const* path, Type type);
 
@@ -71,6 +70,9 @@ public:
 
     void use();
 
+    template<class T>
+    bool setUniform(char const* name, T const& value);
+
 private:
     bool isSuccessful() const;
 
@@ -84,22 +86,33 @@ private:
 class ShaderModule : public ShaderProgram
 {
 public:
-    ShaderModule()
-    {
-        vertexShader   = Shader("./shaders/vertex.glsl", Shader::Type::Vertex);
-        fragmentShader = Shader("./shaders/fragment.glsl", Shader::Type::Fragment);
-        if (vertexShader.compile() && fragmentShader.compile())
-        {
-            addShader(vertexShader);
-            addShader(fragmentShader);
-            compile();
-        }
-    }
-
-private:
-    Shader vertexShader;
-
-    Shader fragmentShader;
+    ShaderModule();
 };
 
+
+template<class T>
+bool ShaderProgram::setUniform(char const* name, T const& value)
+{
+    int uniLoc = glGetUniformLocation(idx, name);
+    if (uniLoc == -1)
+        return false;
+
+    if constexpr (std::is_same_v<T, bool>)
+        glUniform1i(uniLoc, (GLint)value);
+    else if constexpr (std::is_same_v<T, int>)
+        glUniform1i(uniLoc, value);
+    else if constexpr (std::is_same_v<T, float>)
+        glUniform1f(uniLoc, (GLfloat)value);
+    else if constexpr (std::is_same_v<T, Vec3_t>)
+        glUniform3fv(uniLoc, 1, &value[0]);
+    else if constexpr (std::is_same_v<T, Vec4_t>)
+        glUniform4fv(uniLoc, 1, &value[0]);
+    else if constexpr (std::is_same_v<T, Mat3_t>)
+        glUniformMatrix3fv(uniLoc, 1, GL_FALSE, &value[0][0]);
+    else if constexpr (std::is_same_v<T, Mat4_t>)
+        glUniformMatrix4fv(uniLoc, 1, GL_FALSE, &value[0][0]);
+    else
+        return false;
+    return true;
+}
 #endif // SHADER_PROGRAM_H
