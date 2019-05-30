@@ -1,3 +1,4 @@
+#include <ECSpp/ECSWorld.h>
 #include <GGSim/Application.h>
 #include <GGSim/Shape.h>
 #include <GGSim/Transformable.h>
@@ -5,10 +6,13 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 #include <iostream>
+#include <rp3d/reactphysics3d.h>
 
 
 int main()
 {
+    epp::ECSWorld world;
+
     WindowModule& win = Application::instance().get<WindowModule>();
     Box           box({ 100, 1, 100 });
     Sphere        sphere(3.f);

@@ -39,7 +39,7 @@ Box::Box(Vec3_t const& size)
 Sphere::Sphere(float radius)
     : radius(radius)
 {
-    constexpr size_t CirVCnt = 20;
+    constexpr size_t CirVCnt = 30;
     constexpr size_t VCount  = (CirVCnt / 2 - 1) * CirVCnt + 2;
     const float      diff    = 2 * M_PI / CirVCnt;
 

@@ -39,6 +39,7 @@ project "GGSim"
 		{
 			"%{prj.location}/include/",
 			"%{wks.location}/external/include/",
+			"%{wks.location}/external/include/rp3d/", -- only for rp3d library
 		}
 
 		libdirs
@@ -48,9 +49,9 @@ project "GGSim"
 
 
 		filter "configurations:Debug"
-			links  "glfw3_d"
+			links  { "glfw3_d", "reactphysics3d_d", "ECSpp_d" }
 		filter "configurations:Release"
-			links "glfw3"
+			links { "glfw3", "reactphysics3d", "ECSpp" }
 
 		filter{}
 

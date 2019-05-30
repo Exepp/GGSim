@@ -42,11 +42,17 @@ void WindowModule::draw(VertexArray const& va, Transform const& model)
     shader.setUniform<Mat4_t>("view", getTransform().inversed().asMatrix());
     shader.setUniform<Mat4_t>("model", model.asMatrix());
 
+
+    glLineWidth(2.f);
+    // glEnable(GL_LINE_SMOOTH);
+    // glEnable(GL_BLEND);
+    // glDepthMask(false);
+    // glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
     shader.setUniform<bool>("forceBlack", true);
-    glLineWidth(5.f);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     va.draw();
     shader.setUniform<bool>("forceBlack", false);
+    // glDepthMask(true);
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     va.draw();
@@ -66,13 +72,13 @@ void WindowModule::input()
 {
     glfwPollEvents();
     if (glfwGetKey(win, GLFW_KEY_W) == GLFW_PRESS)
-        move({ 0, 0, -0.1 });
+        move({ 0, 0, -0.5 });
     if (glfwGetKey(win, GLFW_KEY_S) == GLFW_PRESS)
-        move({ 0, 0, 0.1 });
+        move({ 0, 0, 0.5 });
     if (glfwGetKey(win, GLFW_KEY_A) == GLFW_PRESS)
-        move({ -0.1, 0, 0 });
+        move({ -0.5, 0, 0 });
     if (glfwGetKey(win, GLFW_KEY_D) == GLFW_PRESS)
-        move({ 0.1, 0, 0 });
+        move({ 0.5, 0, 0 });
     if (glfwGetKey(win, GLFW_KEY_E) == GLFW_PRESS)
         translate({ 0, 0.1, 0 });
     if (glfwGetKey(win, GLFW_KEY_Q) == GLFW_PRESS)
