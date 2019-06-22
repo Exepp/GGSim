@@ -1,7 +1,7 @@
 #ifndef SHADER_PROGRAM_H
 #define SHADER_PROGRAM_H
 
-#include <GGSim/Transformable.h>
+#include <GGSim/Typedefs.h>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <string>

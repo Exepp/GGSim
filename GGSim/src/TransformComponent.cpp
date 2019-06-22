@@ -1,4 +1,4 @@
-#include <GGSim/Transformable.h>
+#include <GGSim/TransformComponent.h>
 
 
 Transform& operator*=(Transform& lhs, Transform const& rhs)

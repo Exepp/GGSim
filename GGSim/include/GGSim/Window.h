@@ -3,8 +3,8 @@
 #define WINDOW_H
 
 #include <GGSim/ShaderProgram.h>
-#include <GGSim/Shape.h>
-#include <GGSim/Transformable.h>
+#include <GGSim/ShapeComponent.h>
+#include <GGSim/TransformComponent.h>
 #include <GGSim/VertexArray.h>
 #include <GLFW/glfw3.h>
 #include <string>
@@ -18,11 +18,11 @@ struct GlfwModule
     GlfwModule()
     {
         if (glfwInit() == GLFW_TRUE)
-        {
-            glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-            glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        }
+            {
+                glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+                glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+                glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+            }
     }
 
     ~GlfwModule()

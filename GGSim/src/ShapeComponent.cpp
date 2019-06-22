@@ -1,10 +1,10 @@
-#include <GGSim/Shape.h>
+#include <GGSim/ShapeComponent.h>
 #include <GGSim/Window.h>
 #include <cmath>
 
 void Shape::draw(WindowModule& win, Transform model) const
 {
-    win.draw(verts, model *= getTransform());
+    win.draw(verts, model);
 }
 
 Box::Box(Vec3_t const& size)
@@ -49,13 +49,13 @@ Sphere::Sphere(float radius)
 
     vertArr.push_back(Vertex({ 0, 1 * radius, 0 }, { 1, 0, 0, 1 }));
     for (int i = 1; i < CirVCnt / 2; ++i)
-    {
-        float currR = fabs(sin(i * diff)) * radius;
-        float y     = cos(i * diff) * radius;
-        for (int j = 0; j < CirVCnt; ++j)
-            vertArr.push_back(Vertex({ sin(j * diff) * currR, y, cos(j * diff) * currR },
-                                     { 1, 0, 0, 1 }));
-    }
+        {
+            float currR = fabs(sin(i * diff)) * radius;
+            float y     = cos(i * diff) * radius;
+            for (int j = 0; j < CirVCnt; ++j)
+                vertArr.push_back(Vertex({ sin(j * diff) * currR, y, cos(j * diff) * currR },
+                                         { 1, 0, 0, 1 }));
+        }
     vertArr.push_back(Vertex({ 0, -1 * radius, 0 }, { 1, 0, 0, 1 }));
 
     verts.set(std::move(vertArr));
@@ -65,30 +65,30 @@ Sphere::Sphere(float radius)
     idxArr.reserve(CirVCnt / 2 * CirVCnt);
 
     for (int i = 0; i < CirVCnt; ++i)
-    {
-        idxArr.push_back(0);
-        idxArr.push_back(i % CirVCnt + 1);
-        idxArr.push_back((i + 1) % CirVCnt + 1);
-    }
+        {
+            idxArr.push_back(0);
+            idxArr.push_back(i % CirVCnt + 1);
+            idxArr.push_back((i + 1) % CirVCnt + 1);
+        }
 
     for (int i = 1; i < CirVCnt / 2 - 1; ++i)
         for (int j = 0; j < CirVCnt; ++j)
-        {
-            idxArr.push_back((i - 1) * CirVCnt + j + 1);
-            idxArr.push_back(i * CirVCnt + j % CirVCnt + 1);
-            idxArr.push_back(i * CirVCnt + (j + 1) % CirVCnt + 1);
-            idxArr.push_back((i - 1) * CirVCnt + j + 1);
-            idxArr.push_back((i - 1) * CirVCnt + (j + 1) % CirVCnt + 1);
-            idxArr.push_back(i * CirVCnt + (j + 1) % CirVCnt + 1);
-        }
+            {
+                idxArr.push_back((i - 1) * CirVCnt + j + 1);
+                idxArr.push_back(i * CirVCnt + j % CirVCnt + 1);
+                idxArr.push_back(i * CirVCnt + (j + 1) % CirVCnt + 1);
+                idxArr.push_back((i - 1) * CirVCnt + j + 1);
+                idxArr.push_back((i - 1) * CirVCnt + (j + 1) % CirVCnt + 1);
+                idxArr.push_back(i * CirVCnt + (j + 1) % CirVCnt + 1);
+            }
 
     int lastCIdx = VCount - CirVCnt - 1 - 1;
     for (int i = 0; i < CirVCnt; ++i)
-    {
-        idxArr.push_back(lastCIdx + i % CirVCnt + 1);
-        idxArr.push_back(lastCIdx + (i + 1) % CirVCnt + 1);
-        idxArr.push_back(VCount - 1);
-    }
+        {
+            idxArr.push_back(lastCIdx + i % CirVCnt + 1);
+            idxArr.push_back(lastCIdx + (i + 1) % CirVCnt + 1);
+            idxArr.push_back(VCount - 1);
+        }
 
     verts.set(std::move(idxArr));
 }
