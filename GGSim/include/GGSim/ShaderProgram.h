@@ -2,7 +2,6 @@
 #define SHADER_PROGRAM_H
 
 #include <GGSim/Typedefs.h>
-#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <string>
 
@@ -44,7 +43,7 @@ private:
     void clear();
 
 private:
-    GLuint idx = 0;
+    uint_t idx = 0;
 
     std::string src;
 
@@ -77,7 +76,7 @@ private:
     bool isSuccessful() const;
 
 private:
-    GLuint idx = 0;
+    uint_t idx = 0;
 
     bool compiled = false;
 };
@@ -93,13 +92,13 @@ public:
 template<class T>
 bool ShaderProgram::setUniform(char const* name, T const& value)
 {
-    int uniLoc = glGetUniformLocation(idx, name);
+    int_t uniLoc = glGetUniformLocation(idx, name);
     if (uniLoc == -1)
         return false;
 
     if constexpr (std::is_same_v<T, bool>)
         glUniform1i(uniLoc, (GLint)value);
-    else if constexpr (std::is_same_v<T, int>)
+    else if constexpr (std::is_same_v<T, int_t>)
         glUniform1i(uniLoc, value);
     else if constexpr (std::is_same_v<T, float>)
         glUniform1f(uniLoc, (GLfloat)value);

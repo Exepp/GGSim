@@ -87,7 +87,7 @@ void Shader::clear()
 
 bool Shader::isSuccessful() const
 {
-    int status = 0;
+    int_t status = 0;
     glGetShaderiv(idx, GL_COMPILE_STATUS, &status);
 
     if (!status)
@@ -118,7 +118,7 @@ bool ShaderProgram::addShader(Shader const& shader)
 
 bool ShaderProgram::isSuccessful() const
 {
-    int status = 0;
+    int_t status = 0;
     glGetProgramiv(idx, GL_LINK_STATUS, &status);
 
     if (!status)
@@ -157,7 +157,7 @@ ShaderModule::ShaderModule()
         if (compile())
         {
             use();
-            auto winSize = Application::instance().get<WindowModule>().Size;
+            auto winSize = App::getModules().windowM.Size;
             setUniform<Mat4_t>("proj", glm::perspective(glm::radians(45.f), winSize.x / winSize.y, 0.1f, 1000.f));
         }
     }

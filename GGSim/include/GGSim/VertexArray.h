@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include <vector>
 
+
 struct Vertex
 {
     Vertex(Vec3_t const& pos = Vec3_t(0, 0, 0), Vec4_t const& clr = Vec4_t(0, 0, 0, 1))
@@ -33,11 +34,11 @@ public:
 public:
     VertexArray();
 
-    VertexArray(VertexArray const& obj);
+    VertexArray(VertexArray const&) = delete;
 
     VertexArray(VertexArray&& obj);
 
-    VertexArray& operator=(VertexArray const& obj);
+    VertexArray& operator=(VertexArray const&) = delete;
 
     VertexArray& operator=(VertexArray&& obj);
 
@@ -58,6 +59,11 @@ public:
 
 
     void draw() const;
+
+
+    VertArr_t const& getVertsArr() const;
+
+    IdxArr_t const& getIdxsArr() const;
 
 private:
     void updateVerts() const;

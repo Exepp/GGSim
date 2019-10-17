@@ -39,7 +39,7 @@ project "GGSim"
 		{
 			"%{prj.location}/include/",
 			"%{wks.location}/external/include/",
-			"%{wks.location}/external/include/rp3d/", -- only for rp3d library
+			"%{wks.location}/external/include/bullet3/", -- only for bullet3
 		}
 
 		libdirs
@@ -49,19 +49,17 @@ project "GGSim"
 
 
 		filter "configurations:Debug"
-			links  { "glfw3_d", "reactphysics3d_d", "ECSpp_d" }
+			links  { "ECSpp_d", "BulletCollision_d", "LinearMath_d", "glfw3_d" }
 		filter "configurations:Release"
-			links { "glfw3", "reactphysics3d", "ECSpp" }
-
+			links { "ECSpp", "BulletCollision", "LinearMath", "glfw3" }
 		filter{}
+
+		links { "X11", "dl", "pthread" }
 
 		postbuildcommands 
 		{
 			"{COPY} %{prj.location}/src/shaders %{cfg.targetdir}"
 		}
-
-		links { "dl", "X11", "GL", "pthread", "Xrandr", "Xi" }
-
 
 		filter "system:windows"
 			staticruntime "On"

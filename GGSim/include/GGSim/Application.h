@@ -1,31 +1,29 @@
-#include <GGSim/Initializer.h>
 #include <GGSim/ShaderProgram.h>
 #include <GGSim/Window.h>
 
 
-class Application
+class App
 {
-private:
-    using Initer_t = Initializer<GlfwModule, WindowModule, GladModule, ShaderModule>;
+    struct Modules
+    {
+        GlfwModule   glfwM;
+        WindowModule windowM;
+        GladModule   gladM;
+        ShaderModule shaderM;
+    };
 
-    template<class T>
-    using MPtr_t = Initer_t::MPtr_t<T>;
+    using ModulesPtr_t = std::unique_ptr<Modules>;
 
 public:
-    static Application& instance();
+    static Modules& getModules();
 
-
-    template<class T>
-    T& get()
-    {
-        return *initer.mPack.get<MPtr_t<T>>();
-    }
+    static void startUp();
+    static void shutDown();
 
 private:
-    Application() = default;
+    RULEOF5_BAN_ALL(App);
 
 private:
-    Initer_t initer;
-
-    static Application app;
+    static Modules modules;
+    static bool    inited;
 };

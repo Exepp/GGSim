@@ -22,19 +22,9 @@ VertexArray::VertexArray()
     glEnableVertexAttribArray(1);
 }
 
-VertexArray::VertexArray(VertexArray const& obj)
-    : VertexArray(obj.verts, obj.idxs)
-{
-}
-
 VertexArray::VertexArray(VertexArray&& obj)
 {
     *this = std::move(obj);
-}
-
-VertexArray& VertexArray::operator=(VertexArray const& obj)
-{
-    return *this = VertexArray(obj);
 }
 
 VertexArray& VertexArray::operator=(VertexArray&& obj)
@@ -114,4 +104,14 @@ void VertexArray::draw() const
 {
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, idxs.size(), GL_UNSIGNED_INT, 0);
+}
+
+VertexArray::VertArr_t const& VertexArray::getVertsArr() const
+{
+    return verts;
+}
+
+VertexArray::IdxArr_t const& VertexArray::getIdxsArr() const
+{
+    return idxs;
 }

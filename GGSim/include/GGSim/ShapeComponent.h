@@ -1,63 +1,49 @@
-#ifndef SHAPE_H
-#define SHAPE_H
+#ifndef SHAPECOMPONENT_H
+#define SHAPECOMPONENT_H
 
-#include <GGSim/TransformComponent.h>
-#include <GGSim/VertexArray.h>
-#include <memory>
-
-class WindowModule;
+#include <ECSpp/Component.h>
+#include <GGSim/Shape.h>
 
 
-struct Drawable
+class ShapeComponent : public epp::Component
 {
-    virtual ~Drawable() = default;
-
-    virtual void draw(WindowModule& win, Transform model = Transform()) const = 0;
-};
-
-
-class Shape : public Drawable
-{
-    using VertArr_t = VertexArray;
+private:
+    using CObj_t     = btCollisionObject;
+    using CObjPtr_t  = std::unique_ptr<CObj_t>;
+    using ShapePtr_t = std::unique_ptr<Shape>;
 
 public:
-    virtual void draw(WindowModule& win, Transform model = Transform()) const override;
-
-protected:
-    VertArr_t verts;
-};
-
-
-struct Box : public Shape
-{
-    Box(Vec3_t const& size);
-
-    Vec3_t const size;
-};
-
-
-struct Sphere : public Shape
-{
-    Sphere(float radius);
-
-    float const radius;
-};
-
-
-struct ShapeComponent : public epp::Component
-{
-    template<class T>
-    using UniqPtr_t = std::unique_ptr<T>;
-
-    using ShapePtr_t = UniqPtr_t<Shape>;
+    ShapeComponent();
+    RULEOF4_BAN_COPY(ShapeComponent)
 
     template<class T>
-    void setShape(T newShape)
-    {
-        shape = std::make_unique<T>(std::move(newShape));
-    }
+    void setShape(T newShape);
+    void setTransform(Transform const& t);
 
+    bool confirmShapeChange(); // sets changedShape to false, returns previous value
+    bool isShapeChanged() const;
+
+    CObj_t*       getCollisionObj();
+    CObj_t const* getCollisionObj() const;
+
+    Shape*       getShape();
+    Shape const* getShape() const;
+
+private:
     ShapePtr_t shape;
+
+    CObjPtr_t cObj;
+
+    bool changedShape = false;
 };
 
-#endif // SHAPE_H
+
+template<class T>
+void ShapeComponent::setShape(T newShape)
+{
+    shape = std::make_unique<T>(std::move(newShape));
+    cObj->setCollisionShape(shape->getCollisionShape());
+    changedShape = true;
+}
+
+#endif // SHAPECOMPONENT_H
