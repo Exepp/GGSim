@@ -72,12 +72,10 @@ void PhysicsSystem::applyGravity()
         phyC.applyForce(Vec3_t(0, -GravitationalAcc * phyC.mass(), 0));
     }
 }
-#include <ECSpp/Utility/Time.h>
 
 void PhysicsSystem::resolveCollisions()
 {
     cWorld.performDiscreteCollisionDetection();
-    // drawContactPoints();
 
     size_t manifNum = cWorld.getDispatcher()->getNumManifolds();
     for (int i = 0; i < manifNum; ++i)
@@ -87,7 +85,6 @@ void PhysicsSystem::resolveCollisions()
         size_t cNum = mfld->getNumContacts();
         if (cNum == 0)
             continue;
-        float cNumInv = 1.f / cNum;
 
         epp::EntityRef      e1(((epp::Entity*)(mfld->getBody0()->getUserPointer()))->shared_from_this());
         epp::EntityRef      e2(((epp::Entity*)(mfld->getBody1()->getUserPointer()))->shared_from_this());
@@ -96,80 +93,99 @@ void PhysicsSystem::resolveCollisions()
         PhysicsComponent&   phyC1    = *e1.getComponent<PhysicsComponent>();
         PhysicsComponent&   phyC2    = *e2.getComponent<PhysicsComponent>();
 
-        Vec3_t n(0, 0, 0);
-        Vec3_t r1(0, 0, 0);
-        Vec3_t r2(0, 0, 0);
-        float  pen = 0;
-
+        Vec3_t maxPenN(0, 0, 0);
+        float  maxPen = 0;
         for (int j = 0; j < cNum; ++j)
         {
             btManifoldPoint const& pt = mfld->getContactPoint(j);
-            n += toVec3(pt.m_normalWorldOnB);
-            r1 += toVec3(pt.m_localPointA);
-            r2 += toVec3(pt.m_localPointB);
-            pen += pt.getDistance();
+            if (maxPen > pt.getDistance())
+            {
+                maxPen  = pt.getDistance();
+                maxPenN = toVec3(pt.m_normalWorldOnB);
+            }
         }
+        float vrn1 = glm::dot(phyC1.vel, maxPenN);
+        float vrn2 = glm::dot(phyC2.vel, maxPenN);
 
-        n *= cNumInv;
-        r1 = transfC1.orient * (r1 * cNumInv);
-        r2 = transfC2.orient * (r2 * cNumInv);
-        pen *= cNumInv;
-
-        Vec3_t v1     = phyC1.velocityAt(r1);
-        Vec3_t v2     = phyC2.velocityAt(r2);
-        Vec3_t vr     = v1 - v2;
-        float  vrProj = glm::dot(n, vr);
-        Vec3_t vrn    = vrProj * n;
-        Vec3_t t      = vr - vrn;
-        if (glm::length(t) > 0.001f)
-            t = glm::normalize(t);
-        else
-            t = Vec3_t(0, 0, 0);
-
-        if (vrProj > 0)
-            continue;
-
-        if (phyC1.mass() != INFINITY)
-            transfC1.pos += n * (-pen);
+        if (phyC1.mass() != INFINITY && (-vrn1 >= vrn2 || phyC2.mass() == INFINITY))
+            transfC1.pos += maxPenN * (-std::min(maxPen + 0.01f, 0.f));
         else if (phyC2.mass() != INFINITY)
-            transfC2.pos += n * (pen);
+            transfC2.pos += maxPenN * (std::min(maxPen + 0.01f, 0.f));
         else
             continue;
 
-
-        // printf("%f %f %f\n", transfC2.pos.x, transfC2.pos.y, transfC2.pos.z);
-        // transfC1.moveGlobal(glm::normalize(-phyC1.vel) * std::max(glm::length(phyC1.vel) * 0.01666f, pen));
-
-        Mat3_t inertiaTInvW1 = glm::toMat3(transfC1.orient) *
-                               phyC1.tensorInversed() *
-                               glm::toMat3(glm::inverse(transfC1.orient));
-        Mat3_t inertiaTInvW2 = glm::toMat3(transfC2.orient) *
-                               phyC2.tensorInversed() *
-                               glm::toMat3(glm::inverse(transfC2.orient));
-
-        float e  = (phyC1.restitution + phyC2.restitution) * 0.5f;
-        float uD = (phyC1.dyFrCo + phyC2.dyFrCo) * 0.5f;
-
-        printf("%f\n", glm::length(vr));
-        if (glm::length(vr) < 1.f)
+        // for (int k = 0; k < 8; ++k)
         {
-            e  = 0.f;
-            uD = -1.f;
+            for (int j = 0; j < cNum; ++j)
+            {
+                btManifoldPoint const& pt = mfld->getContactPoint(j);
+                Vec3_t                 n(0, 0, 0);
+                Vec3_t                 r1(0, 0, 0);
+                Vec3_t                 r2(0, 0, 0);
+
+                n  = toVec3(pt.m_normalWorldOnB);
+                r1 = transfC1.orient * toVec3(pt.m_localPointA);
+                r2 = transfC2.orient * toVec3(pt.m_localPointB);
+
+                Vec3_t v1  = phyC1.velocityAt(r1);
+                Vec3_t v2  = phyC2.velocityAt(r2);
+                Vec3_t vr  = v1 - v2;
+                float  vrn = glm::dot(n, vr);
+
+                if (vrn > 0)
+                    continue;
+
+                Vec3_t t;
+                if (glm::length(vr - vrn * n) > 0.001f)
+                {
+                    t = vr - vrn * n;
+                    t = glm::normalize(t);
+                }
+                else if (glm::length(phyC2.force - glm::dot(phyC2.force, n) * n) > 0.001f)
+                {
+                    t = phyC2.force - glm::dot(phyC2.force, n) * n;
+                    t = glm::normalize(t);
+                }
+                else
+                    t = Vec3_t(0, 0, 0);
+
+                Mat3_t inertiaTInvW1 = glm::toMat3(transfC1.orient) *
+                                       phyC1.tensorInversed() *
+                                       glm::transpose(glm::toMat3(transfC1.orient));
+                Mat3_t inertiaTInvW2 = glm::toMat3(transfC2.orient) *
+                                       phyC2.tensorInversed() *
+                                       glm::transpose(glm::toMat3(transfC2.orient));
+
+                float e  = (phyC1.restitution + phyC2.restitution) * 0.5f;
+                float uD = (phyC1.dyFrCo + phyC2.dyFrCo) * 0.5f;
+                float uS = (phyC1.stFrCo + phyC2.stFrCo) * 0.5f;
+
+                float jr = -(1.f + e) * vrn /
+                           (phyC1.massInversed() + phyC2.massInversed() +
+                            glm::dot(n, glm::cross(inertiaTInvW1 * glm::cross(r1, n), r1) + glm::cross(inertiaTInvW2 * glm::cross(r2, n), r2)));
+
+                // jr /= cNum ;
+                float jt = 0;
+                if (phyC2.mass() * glm::dot(vr, t) <= jr * uS)
+                    jt = -phyC2.mass() * glm::dot(vr, t);
+                else
+                    jt = -uD * jr;
+
+                if (phyC1.mass() != INFINITY)
+                {
+                    phyC1.vel += phyC1.massInversed() * (jr * n + jt * t);
+                    phyC1.angularVel += jr * inertiaTInvW1 * glm::cross(r1, n);
+                    phyC1.angularVel += jt * inertiaTInvW1 * glm::cross(r1, t);
+                }
+
+                if (phyC2.mass() != INFINITY)
+                {
+                    phyC2.vel -= phyC2.massInversed() * (jr * n + jt * t);
+                    phyC2.angularVel -= jr * inertiaTInvW2 * glm::cross(r2, n);
+                    phyC2.angularVel -= jt * inertiaTInvW2 * glm::cross(r2, t);
+                }
+            }
         }
-
-        Vec3_t j = -(e + 1.f) * vrn /
-                   (phyC1.massInversed() + phyC2.massInversed() +
-                    glm::dot(n, glm::cross(inertiaTInvW1 * glm::cross(r1, n), r1)) +
-                    glm::dot(n, glm::cross(inertiaTInvW2 * glm::cross(r2, n), r2)));
-        float jtd = -uD * glm::length(j);
-
-        // Vec3_t jtd = -(vr - vrn) / (phyC1.massInversed() + phyC2.massInversed());
-        // if (j.y < -5)
-        //     printf("%f %f %f\n", j.x, j.y, j.z);
-        phyC1.vel += phyC1.massInversed() * (j + jtd * t);
-        phyC2.vel -= phyC2.massInversed() * (j + jtd * t);
-        phyC1.angularVel += inertiaTInvW1 * glm::cross(r1, j + jtd * t);
-        phyC2.angularVel -= inertiaTInvW2 * glm::cross(r2, j + jtd * t);
     }
 }
 

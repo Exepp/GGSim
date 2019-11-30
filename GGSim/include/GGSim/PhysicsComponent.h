@@ -17,7 +17,7 @@ struct PhysicsComponent : public epp::Component
     inline float  mass() const { return m; }
     inline float  massInversed() const { return mInv; }
     inline Mat3_t tensor() const { return iTensor * m; }
-    inline Mat3_t tensorInversed() const { return iTensorInv * 1.f / m; }
+    inline Mat3_t tensorInversed() const { return mInv * iTensorInv; }
 
     // argument in world space (to match the space that the angular velocity is described in)
     Vec3_t velocityAt(Vec3_t const& relativePos) const;
@@ -31,14 +31,14 @@ struct PhysicsComponent : public epp::Component
     Vec3_t angularAcc = Vec3_t(0, 0, 0);
     Vec3_t angularVel = Vec3_t(0, 0, 0);
 
-    float restitution = 0.3f;
+    float restitution = 0.2f;
 
-    float stFrCo = 0.4f;
-    float dyFrCo = 0.3f;
+    float stFrCo = 0.9f;
+    float dyFrCo = 0.65f;
 
 private:
-    float  m          = 10.f;
-    float  mInv       = 1.f / 10.f;
+    float  m          = 50.f;
+    float  mInv       = 1.f / 50.f;
     Mat3_t iTensor    = Mat3_t(0);
     Mat3_t iTensorInv = Mat3_t(0);
 };

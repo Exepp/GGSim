@@ -4,6 +4,9 @@
 #include <ECSpp/Component.h>
 #include <GGSim/Shape.h>
 
+struct NoDrawTag : public epp::Component
+{};
+
 
 class ShapeComponent : public epp::Component
 {

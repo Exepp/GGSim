@@ -33,7 +33,7 @@ static void focus_callback(GLFWwindow* window, int focused)
 
 
 WindowModule::WindowModule()
-    : Size(800, 600)
+    : Size(1280, 720)
 {
     win = glfwCreateWindow(Size.x, Size.y, "GGSim", NULL, NULL);
     glfwMakeContextCurrent(win);

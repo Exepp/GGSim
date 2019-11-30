@@ -4,18 +4,19 @@
 
 void DisplaySystem::init(epp::EntityManager& entityManager)
 {
-    entityManager.requestCGroup(entities);
+    entityManager.requestCGroup(entities, { epp::getCTypeId<NoDrawTag>() });
 }
 
 void DisplaySystem::update(epp::EntityManager& entityManager, float dt, bool catchUpTick)
 {
-    if (catchUpTick)
-        return;
+    // if (catchUpTick)
+    //     return;
 
     WindowModule& winM = App::getModules().windowM;
 
     for (auto entity : entities)
         entity.get<ShapeComponent&>().getShape()->draw(winM, entity.get<TransformComponent&>());
     winM.display();
+
     winM.clear();
 }
