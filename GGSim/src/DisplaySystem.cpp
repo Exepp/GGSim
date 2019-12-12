@@ -16,6 +16,7 @@ void DisplaySystem::update(epp::EntityManager& entityManager, float dt, bool cat
 
     for (auto entity : entities)
         entity.get<ShapeComponent&>().getShape()->draw(winM, entity.get<TransformComponent&>());
+
     winM.display();
 
     winM.clear();

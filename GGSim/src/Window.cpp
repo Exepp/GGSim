@@ -88,9 +88,9 @@ void WindowModule::drawPoint(Vertex const& v, float size)
                                   2, 3, 0 });
 
     Transform transf;
-    orient = orient;
-    sca    = Vec3_t(size, size, size);
-    pos    = v.pos;
+    transf.orient = orient;
+    transf.sca    = Vec3_t(size, size, size);
+    transf.pos    = v.pos;
 
     draw(billboard, transf, false);
 }
@@ -103,7 +103,7 @@ void WindowModule::display()
 void WindowModule::input()
 {
     glfwPollEvents();
-    float speed = 0.6;
+    float speed = 1 / 650.f * 50.f;
     if (glfwGetKey(win, GLFW_KEY_W) == GLFW_PRESS)
         moveLocal({ 0, 0, -speed });
     if (glfwGetKey(win, GLFW_KEY_S) == GLFW_PRESS)
