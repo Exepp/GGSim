@@ -4,43 +4,43 @@
 #include <ECSpp/Component.h>
 #include <GGSim/Typedefs.h>
 
-struct PhysicsComponent : public epp::Component
-{
-    // arguments in world space
-    PhysicsComponent& applyForce(Vec3_t const& f, Vec3_t const& relativePos = Vec3_t(0, 0, 0));
+struct PhysicsComponent : public epp::Component {
+  // arguments in world space
+  PhysicsComponent &applyForce(Vec3_t const &f,
+                               Vec3_t const &relativePos = Vec3_t(0, 0, 0));
 
-    void resetForNextTick();
+  void resetForNextTick();
 
-    void setMass(float mass);
-    void setInertiaTensor(Mat3_t const& tensor);
+  void setMass(float mass);
+  void setInertiaTensor(Mat3_t const &tensor);
 
-    inline float  mass() const { return m; }
-    inline float  massInversed() const { return mInv; }
-    inline Mat3_t tensor() const { return iTensor * m; }
-    inline Mat3_t tensorInversed() const { return mInv * iTensorInv; }
+  inline float mass() const { return m; }
+  inline float massInversed() const { return mInv; }
+  inline Mat3_t tensor() const { return iTensor * m; }
+  inline Mat3_t tensorInversed() const { return mInv * iTensorInv; }
 
-    // argument in world space (to match the space that the angular velocity is described in)
-    Vec3_t velocityAt(Vec3_t const& relativePos) const;
+  // argument in world space (to match the space that the angular velocity is
+  // described in)
+  Vec3_t velocityAt(Vec3_t const &relativePos) const;
 
+  Vec3_t force = Vec3_t(0, 0, 0);
+  Vec3_t acc = Vec3_t(0, 0, 0);
+  Vec3_t vel = Vec3_t(0, 0, 0);
 
-    Vec3_t force = Vec3_t(0, 0, 0);
-    Vec3_t acc   = Vec3_t(0, 0, 0);
-    Vec3_t vel   = Vec3_t(0, 0, 0);
+  Vec3_t torque = Vec3_t(0, 0, 0);
+  Vec3_t angularAcc = Vec3_t(0, 0, 0);
+  Vec3_t angularVel = Vec3_t(0, 0, 0);
 
-    Vec3_t torque     = Vec3_t(0, 0, 0);
-    Vec3_t angularAcc = Vec3_t(0, 0, 0);
-    Vec3_t angularVel = Vec3_t(0, 0, 0);
+  float restitution = 0.8f;
 
-    float restitution = 0.4f;
-
-    float stFrCo = 0.7f;
-    float dyFrCo = 0.5f;
+  float stFrCo = 0.7f;
+  float dyFrCo = 0.4f;
 
 private:
-    float  m          = 50.f;
-    float  mInv       = 1.f / 50.f;
-    Mat3_t iTensor    = Mat3_t(0);
-    Mat3_t iTensorInv = Mat3_t(0);
+  float m = 50.f;
+  float mInv = 1.f / 50.f;
+  Mat3_t iTensor = Mat3_t(0);
+  Mat3_t iTensorInv = Mat3_t(0);
 };
 
 #endif // PHYSICSCOMPONENT_H
