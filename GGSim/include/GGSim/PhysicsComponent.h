@@ -31,7 +31,7 @@ struct PhysicsComponent : public epp::Component {
   Vec3_t angularAcc = Vec3_t(0, 0, 0);
   Vec3_t angularVel = Vec3_t(0, 0, 0);
 
-  float restitution = 0.8f;
+  float restitution = 0.4f;
 
   float stFrCo = 0.7f;
   float dyFrCo = 0.4f;
