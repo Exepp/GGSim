@@ -1,74 +1,62 @@
-workspace "GGSim"
-
-	architecture "x64"
+workspace "GGEngine"
 
 	language "C++"
 
+	architecture "x64"
+
 	cppdialect "C++17"
 
-	toolset "clang"
+	configurations { "Debug", "Release" }
 
-	configurations
+
+	filter {"system:windows"}
+		links { "Shlwapi" }
+		systemversion "latest"
+
+	filter {"system:linux"}
+		links { "pthread" }
+		toolset "clang"
+		buildoptions{"-fPIC -Wno-dangling-else"}
+
+
+	filter "configurations:Debug"
+		defines "EPP_DEBUG"
+		symbols "On"
+		
+	filter "configurations:Release"
+		defines {"EPP_RELEASE"}
+		optimize "On"
+	filter{}
+	
+	includedirs
 	{
-		"Debug",
-		"Release"
+		"./include/",
+		"./external/include/",
+		"/media/exepp/Shared/Code/ECSpp/include/"
+	}
+
+	libdirs
+	{
+		"./external/lib/"
 	}
 
 outDir = "%{cfg.system}_%{cfg.architecture}/%{cfg.buildcfg}/"
 
-project "GGSim"
+	targetdir ("bin/" .. outDir .. "%{prj.name}")
 
-		location "GGSim"
-
-		kind "ConsoleApp"
+	objdir ("bin_inter/" .. outDir .. "%{prj.name}")
 
 
-		targetdir ("bin/" .. outDir .. "%{prj.name}")
+project "GGEngine"
 
-		objdir ("bin_inter/" .. outDir .. "%{prj.name}")
+	kind "ConsoleApp"
 
+	location "./"
 
-		files
-		{
-			"%{prj.location}/src/**",
-			"%{prj.location}/include/**",
-			"%{wks.location}/external/src/**",
-		}
+	files
+	{
+		"%{prj.location}/src/%{prj.name}/**",
+		"%{prj.location}/external/src/%{prj.name}/**",
+	}
 
-		includedirs
-		{
-			"%{prj.location}/include/",
-			"%{wks.location}/external/include/",
-			"%{wks.location}/external/include/bullet3/", -- only for bullet3
-		}
-
-		libdirs
-		{
-			"%{wks.location}/external/lib/",
-		}
-
-
-		filter "configurations:Debug"
-			links  { "ECSpp_d", "BulletCollision_d", "LinearMath_d", "glfw3_d" }
-		filter "configurations:Release"
-			links { "ECSpp", "BulletCollision", "LinearMath", "glfw3" }
-		filter{}
-
-		links { "X11", "dl", "pthread" }
-
-		postbuildcommands 
-		{
-			"{COPY} %{prj.location}/src/shaders %{cfg.targetdir}"
-		}
-
-		filter "system:windows"
-			staticruntime "On"
-			systemversion "latest"
-
-
-		filter "configurations:Debug"
-			defines "GGS_DEBUG"
-			symbols "On"
-		filter "configurations:Release"
-			defines "GGS_RELEASE"
-			optimize "On"
+	links { "sfml-graphics", "sfml-window", "sfml-system"}
